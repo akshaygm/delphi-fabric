@@ -4,7 +4,7 @@ const helper = require('./helper');
 const logger = require('../common/nodejs/logger').new('testInstall');
 const chaincodeConfig = require('../config/chaincode.json');
 const globalConfig = require('../config/orgs');
-const chaincodeId = process.env.name ? process.env.name : 'adminChaincode';
+const chaincodeId = process.env.name ? process.env.name : 'trade';
 
 const chaincodePath = chaincodeConfig.chaincodes[chaincodeId].path;
 

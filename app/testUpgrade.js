@@ -4,7 +4,7 @@ const logger = require('../common/nodejs/logger').new('testUpgrade');
 const Query = require('../common/nodejs/query');
 const {updateInstall, nextVersion, upgrade} = require('../common/nodejs/chaincode');
 
-const chaincodeId = process.env.name ? process.env.name : 'adminChaincode';
+const chaincodeId = process.env.name ? process.env.name : 'trade';
 
 const args = [];
 

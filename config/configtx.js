@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 const {CryptoPath} = require('../common/nodejs/path');
+const logger = require('log4js').getLogger('configtx');
 exports.gen = ({consortiumName = 'SampleConsortium', MSPROOT, PROFILE_BLOCK, configtxFile}) => {
 	const channelsConfig = globalConfig.channels;
 	const ordererConfig = globalConfig.orderer;
@@ -69,8 +70,8 @@ exports.gen = ({consortiumName = 'SampleConsortium', MSPROOT, PROFILE_BLOCK, con
 	const Organizations = [];
 
 
-	const OrganizationBuilder = (orgName) => {
-		const orgConfig = orgsConfig[orgName];
+	const OrganizationBuilder = (orgName,orgConfig) => {
+		logger.info(Object.keys(orgConfig));
 		const peerIndex = 0;
 		const cryptoPath = new CryptoPath(MSPROOT, {
 			peer: {
@@ -87,8 +88,8 @@ exports.gen = ({consortiumName = 'SampleConsortium', MSPROOT, PROFILE_BLOCK, con
 			}]
 		};
 	};
-	for (const orgName in orgsConfig) {
-		Organizations.push(OrganizationBuilder(orgName));
+	for (const [orgName,orgConfig] of Object.entries(orgsConfig)) {
+		Organizations.push(OrganizationBuilder(orgName,orgConfig));
 	}
 	blockProfileConfig.Consortiums = {
 		[consortiumName]: {
