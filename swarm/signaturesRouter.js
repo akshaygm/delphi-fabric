@@ -10,7 +10,7 @@ const Multer = require('multer');
 const fs = require('fs');
 const {port: signServerPort} = require('./swarm.json').signServer;
 const {cache, port: swarmServerPort} = require('./swarm.json').swarmServer;
-const {homeResolve} = require('../common/nodejs/path');
+const {homeResolve,fsExtra} = require('../common/nodejs/path');
 const multerCache = Multer({dest: homeResolve(cache)});
 const {RequestPromise} = require('../common/nodejs/express/serverClient');
 
@@ -54,7 +54,7 @@ router.post('/getSwarmSignatures', multerCache.single('proto'), async (req, res)
 });
 const signatureCollector = async (proto) => {
 	const tempFile = homeResolve(cache, 'proto');
-	fs.writeFileSync(tempFile, proto);
+	fsExtra.outputFileSync(tempFile, proto);
 	const formData = {
 		proto: fs.createReadStream(tempFile)
 	};

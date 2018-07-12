@@ -1,9 +1,8 @@
 const globalConfig = require('../config/orgs');
 const {TLS, docker: {fabricTag, network, volumes: {MSPROOT: {dir: mspDir}}}, orderer: {genesis_block: {file: BLOCK_FILE}}} = globalConfig;
 const protocol = TLS ? 'https' : 'http';
-const fsExtra = require('fs-extra');
 const logger = require('../common/nodejs/logger').new('local orderer');
-const {CryptoPath, homeResolve} = require('../common/nodejs/path');
+const {CryptoPath,fsExtra,homeResolve} = require('../common/nodejs/path');
 const {genOrderer, init} = require('../common/nodejs/ca-crypto-gen');
 const caUtil = require('../common/nodejs/ca');
 const {swarmServiceName, inflateContainerName, containerDelete,containerStart} = require('../common/docker/nodejs/dockerode-util');
