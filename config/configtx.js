@@ -70,8 +70,8 @@ exports.gen = ({consortiumName = 'SampleConsortium', MSPROOT, PROFILE_BLOCK, con
 	const Organizations = [];
 
 
-	const OrganizationBuilder = (orgName,orgConfig) => {
-		logger.info(Object.keys(orgConfig));
+	const OrganizationBuilder = (orgName) => {
+		const orgConfig = orgsConfig[orgName];
 		const peerIndex = 0;
 		const cryptoPath = new CryptoPath(MSPROOT, {
 			peer: {
@@ -88,8 +88,8 @@ exports.gen = ({consortiumName = 'SampleConsortium', MSPROOT, PROFILE_BLOCK, con
 			}]
 		};
 	};
-	for (const [orgName,orgConfig] of Object.entries(orgsConfig)) {
-		Organizations.push(OrganizationBuilder(orgName,orgConfig));
+	for (const orgName in orgsConfig) {
+		Organizations.push(OrganizationBuilder(orgName));
 	}
 	blockProfileConfig.Consortiums = {
 		[consortiumName]: {

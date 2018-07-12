@@ -3,7 +3,7 @@
   "docker": {
     "fabricTag": "1.1.0",
     "thirdPartyTag": "0.4.6",
-    "network": "delphiNetwork",
+    "network": "tradeNetwork",
     "volumes": {
       "CONFIGTX": {
         "dir": "Documents/delphi-fabric/config/configtx"
@@ -14,19 +14,15 @@
     }
   },
   "ledger": {
-    "couchDB": {
-      "container_name": "couchDB",
-      "port": 5984
-    }
   },
   "orderer": {
     "type": "solo",
     "genesis_block": {
-      "file": "delphi.block",
-      "profile": "delphiGenesis"
+      "file": "trade.block",
+      "profile": "tradeGenesis"
     },
     "solo": {
-      "orgName": "Delphi.com",
+      "orgName": "astri.org",
       "container_name": "orderContainerName",
       "portHost": 7050,
       "ca": {
@@ -88,7 +84,17 @@
       "file": "all.tx",
       "eventWaitTime": 30000,
       "orgs": {
-        "ASTRI.Delphi.com": {
+        "Consumer": {
+          "peerIndexes": [
+            0
+          ]
+        },
+        "Merchant": {
+          "peerIndexes": [
+            0
+          ]
+        },
+        "Exchange": {
           "peerIndexes": [
             0
           ]

@@ -1,41 +1,58 @@
 Profiles:
-  delphiGenesis:
+  tradeGenesis:
     Orderer:
       BatchTimeout: 1s
       BatchSize:
         MaxMessageCount: 1
         AbsoluteMaxBytes: 99 MB
         PreferredMaxBytes: 512 KB
-      OrdererType: kafka
+      OrdererType: solo
       Addresses:
-        - 'orderer0.DelphiConsensus.Delphi.com:7050'
-        - 'orderer1.DelphiConsensus.Delphi.com:7050'
-      Kafka:
-        Brokers:
-          - 'kafka0:9092'
-          - 'kafka1:9092'
-          - 'kafka2:9092'
-          - 'kafka3:9092'
+        - 'orderContainerName.astri.org:7050'
       Organizations:
-        - Name: DelphiMSPName
-          ID: DelphiConsensusMSP
-          MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/ordererOrganizations/DelphiConsensus.Delphi.com/msp
+        - Name: OrdererMSPName
+          ID: OrdererMSP
+          MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/ordererOrganizations/astri.org/msp
     Consortiums:
       SampleConsortium:
         Organizations:
-          - Name: ASTRIMSPName
-            ID: ASTRIMSP
-            MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/ASTRI.Delphi.com/msp
+          - Name: Consumer
+            ID: ConsumerMSP
+            MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/Consumer/msp
             AnchorPeers:
-              - Host: peer0.ASTRI.Delphi.com
+              - Host: peer0.Consumer
+                Port: 7051
+          - Name: Merchant
+            ID: MerchantMSP
+            MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/Merchant/msp
+            AnchorPeers:
+              - Host: peer0.Merchant
+                Port: 7051
+          - Name: Exchange
+            ID: ExchangeMSP
+            MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/Exchange/msp
+            AnchorPeers:
+              - Host: peer0.Exchange
                 Port: 7051
   allchannel:
     Consortium: SampleConsortium
     Application:
       Organizations:
-        - Name: ASTRIMSPName
-          ID: ASTRIMSP
-          MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/ASTRI.Delphi.com/msp
+        - Name: Consumer
+          ID: ConsumerMSP
+          MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/Consumer/msp
           AnchorPeers:
-            - Host: peer0.ASTRI.Delphi.com
+            - Host: peer0.Consumer
+              Port: 7051
+        - Name: Merchant
+          ID: MerchantMSP
+          MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/Merchant/msp
+          AnchorPeers:
+            - Host: peer0.Merchant
+              Port: 7051
+        - Name: Exchange
+          ID: ExchangeMSP
+          MSPDir: /home/david/Documents/delphi-fabric/config/ca-crypto-config/peerOrganizations/Exchange/msp
+          AnchorPeers:
+            - Host: peer0.Exchange
               Port: 7051
