@@ -3,6 +3,7 @@ const path = require('path');
 const util = require('util');
 const logger = require('./common/nodejs/logger').new('dockerode-bootstrap');
 const peerUtil = require('./common/nodejs/peer');
+const nodeAppConfigJson = require('./app/config');
 const {
 	runCouchDB,
 	deployCA, runCA,
@@ -13,7 +14,6 @@ const {
 } = require('./common/nodejs/fabric-dockerode');
 const channelUtil = require('./common/nodejs/channel');
 const {CryptoPath, homeResolve,fsExtra} = require('./common/nodejs/path');
-const {PM2} = require('./common/nodejs/express/pm2Manager');
 const MSPROOT = homeResolve(globalConfig.docker.volumes.MSPROOT.dir);
 const CONFIGTX = homeResolve(globalConfig.docker.volumes.CONFIGTX.dir);
 const arch = 'x86_64';
@@ -29,10 +29,6 @@ const {docker: {fabricTag, network, thirdPartyTag}, TLS} = globalConfig;
 const serverClient = require('./common/nodejs/express/serverClient');
 const exec = util.promisify(require('child_process').exec);
 const runConfigtxGenShell = path.resolve(__dirname, 'common', 'bin-manage', 'runConfigtxgen.sh');
-const nodeServers = {
-	swarmServer: path.resolve(__dirname, 'swarm', 'swarmServerPM2.js'),
-	signServer: path.resolve(__dirname, 'swarm', 'signServerPM2.js')
-};
 const configtxlatorServer = require('./common/bin-manage/runConfigtxlator');
 
 exports.runOrderers = async (volumeName = {CONFIGTX: 'CONFIGTX', MSPROOT: 'MSPROOT'}, toStop, swarm) => {
@@ -367,7 +363,6 @@ exports.down = async (swarm) => {
 		await chaincodeClean(true);
 		await exports.volumesAction(toStop);
 
-		const nodeAppConfigJson = require('./app/config');
 		fsExtra.removeSync(nodeAppConfigJson.stateDBCacheDir);
 		logger.info(`[done] clear stateDBCacheDir ${nodeAppConfigJson.stateDBCacheDir}`);
 
@@ -376,15 +371,6 @@ exports.down = async (swarm) => {
 		logger.info(`[done] clear MSPROOT ${MSPROOT}`);
 		fsExtra.emptyDirSync(CONFIGTX);//TODO taking care nfs
 		logger.info(`[done] clear CONFIGTX ${CONFIGTX}`);
-		for (const [name, script] of Object.entries(nodeServers)) {
-			const pm2 = await new PM2().connect();
-			await pm2.delete({name, script});
-			pm2.disconnect();
-		}
-		require('./swarm/swarmServer').clean();
-		require('./swarm/signServer').clean();
-
-		await configtxlatorServer.run('down');
 
 	} catch (err) {
 		logger.error(err);
@@ -396,11 +382,6 @@ exports.down = async (swarm) => {
 exports.up = async (swarm) => {
 	try {
 		await fabricImagePull({fabricTag, thirdPartyTag, arch});
-		for (const [name, script] of Object.entries(nodeServers)) {
-			const pm2 = await new PM2().connect();
-			await pm2.reRun({name, script});
-			pm2.disconnect();
-		}
 		logger.info('[start]swarm Server init steps');
 		if (swarm) {
 			await swarmRenew();
@@ -413,7 +394,6 @@ exports.up = async (swarm) => {
 			await serverClient.ping(swarmServerUrl);
 			await serverClient.leader.update(swarmServerUrl, {ip, hostname: hostname(), managerToken, workerToken});
 		}
-		await configtxlatorServer.run('up');
 
 		await networkCreateIfNotExist({Name: network}, swarm);
 
