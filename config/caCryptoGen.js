@@ -60,8 +60,7 @@ exports.genUser = async ({userName, password}, orgName, swarm) => {
 	});
 
 	const admin = await initAdmin(caService, adminCryptoPath, nodeType, mspId, TLS);
-	const user = await genUser(caService, cryptoPath, nodeType, admin, {TLS, affiliationRoot: orgName});
-	return user;
+	return await genUser(caService, cryptoPath, nodeType, admin, {TLS, affiliationRoot: orgName});
 
 };
 

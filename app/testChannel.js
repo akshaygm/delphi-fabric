@@ -63,24 +63,6 @@ const task = async () => {
 			await joinAllfcn(channelName);
 		} else throw err;
 	}
-	const peerClient = await helper.getOrgAdmin(undefined, 'peer'); //only peer user can read channel
-	try {
-		const channel = helper.prepareChannel(channelName, peerClient);
-		const {original_config} = await configtxlator.getChannelConfigReadable(channel);
-
-		fsExtra.outputFileSync(`${channelName}.json`, original_config);
-	} catch (e) {
-		logger.error(e);
-	}
-	try {
-		const channel = helper.prepareChannel(undefined, client);
-		const {original_config} = await configtxlator.getChannelConfigReadable(channel, 'orderer');
-
-		fsExtra.outputFileSync('testchainid.json', original_config);
-	} catch (e) {
-		logger.error(e);
-	}
-
 };
 task();
 
