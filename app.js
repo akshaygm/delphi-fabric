@@ -2,7 +2,7 @@ const logger = require('./common/nodejs/logger').new('express API');
 const golangUtil = require('./common/nodejs/golang');
 const {homeResolve, fsExtra} = require('./common/nodejs/path');
 const path = require('path');
-const {host, port} = require('./app/config.json');
+const {port} = require('./app/config.json');
 const globalConfig = require('./config/orgs.json');
 const channelsConfig = globalConfig.channels;
 const chaincodesConfig = require('./config/chaincode.json');
@@ -13,7 +13,7 @@ const {create: createChannel} = require('./app/channelHelper');
 const {join: joinChannel} = require('./common/nodejs/channel');
 
 const Query = require('./common/nodejs/query');
-const {app, server} = require('./common/nodejs/express/baseApp').run(port, host);
+const {app, server} = require('./common/nodejs/express/baseApp').run(port);
 const {install} = require('./common/nodejs/chaincode');
 
 
@@ -139,8 +139,8 @@ app.post('/chaincode/install/:chaincodeId', async (req, res) => {
 	}
 
 });
-//  Query Get Block by BlockNumber
-app.post('/query/block/height/:blockNumber', (req, res) => {
+//  Query Get Block by BlockNumber TODO
+app.post('/query/block/height/:blockNumber', async (req, res) => {
 	logger.debug('==================== GET BLOCK BY NUMBER ==================');
 	const {blockNumber} = req.params;
 	const {peerIndex, orgName, channelName} = req.body;
@@ -152,19 +152,20 @@ app.post('/query/block/height/:blockNumber', (req, res) => {
 	}
 	logger.debug({blockNumber, peerIndex, orgName, channelName});
 
-	helper.getOrgAdmin(orgName).then((client) => {
-		const channel = helper.prepareChannel(channelName, client);
-		const peer = helper.newPeers([peerIndex], orgName)[0];
-		return Query.block.height(peer, channel, blockNumber).then((message) => {
-			res.send(message);
-		}).catch(err => {
-			errorSyntaxHandle(err, res);
-		});
-	});
+	const client = await helper.getOrgAdmin(orgName);
+	const channel = helper.prepareChannel(channelName, client);
+	const peer = helper.newPeers([peerIndex], orgName)[0];
+	try {
+		const message = await Query.block.height(peer, channel, blockNumber);
+		res.send(message);
+	} catch (err) {
+		errorSyntaxHandle(err, res);
+	}
+
 
 });
 // Query Get Block by Hash
-app.post('/query/block/hash', (req, res) => {
+app.post('/query/block/hash', async (req, res) => {
 	logger.debug('================ GET BLOCK BY HASH ======================');
 	const {hashHex, peerIndex, orgName, channelName} = req.body;
 	logger.debug({hashHex, peerIndex, orgName, channelName});
@@ -289,4 +290,3 @@ app.post('/query/channelJoined', (req, res) => {
 		errorSyntaxHandle(err, res);
 	});
 });
-//TODO ping docker container

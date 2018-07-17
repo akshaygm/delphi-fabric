@@ -68,10 +68,7 @@ const taskCreateAccount = async (id, org, user) => {
 const taskIssue = async () => {
 	const fcn = tt_new_eToken_issue;
 	const tx = {
-		To: DavidID,
 		Amount: 100,
-		Type: tt_new_eToken_issue,
-		TimeStamp: 0
 	};
 	const args = arrayArgs([DavidID, tx]);
 	const user = await DavidExchange();
@@ -111,8 +108,6 @@ const taskExchangeToken = async (id, org, user, Amount, toID) => {
 	const tx = {
 		To: toID,
 		Amount,
-		Type: tt_fiat_eToken_exchange,
-		TimeStamp: 0
 	};
 	const args = arrayArgs([id, tx]);
 	const client = await getClient(user);
@@ -125,8 +120,6 @@ const taskTransfer = async (id, org, user, Amount, toID) => {
 	const tx = {
 		To: toID,
 		Amount,
-		Type: tt,
-		TimeStamp: 0
 	};
 	const args = arrayArgs([id, tx]);
 	const client = await getClient(user);
@@ -140,8 +133,6 @@ const taskPurchase = async (id, org, user, toID, {Amount, MerchandiseCode, Merch
 	const tx = {
 		To: toID,
 		Amount,
-		Type: tt_consumer_purchase,
-		TimeStamp: 0,
 		MerchandiseCode,
 		MerchandiseAmount,
 		ConsumerDeliveryInstruction,
@@ -179,16 +170,16 @@ const viewPurchase = async (id, {Start, End, Status}) => {
 		Start, End, Status
 	};
 	switch (id) {
-		case LamID:
-			user = await LamMerchant();
-			org = orgMerchant;
-			break;
-		case StanleyID:
-			user = await StanleyConsumer();
-			org = orgConsumer;
-			break;
-		default:
-			return;
+	case LamID:
+		user = await LamMerchant();
+		org = orgMerchant;
+		break;
+	case StanleyID:
+		user = await StanleyConsumer();
+		org = orgConsumer;
+		break;
+	default:
+		return;
 	}
 
 	const args = arrayArgs([id, {}, filter]);
@@ -208,23 +199,22 @@ const viewBalance = async (id) => {
 	let user;
 	let balance;
 	switch (id) {
-		case DavidID:
-			user = await DavidExchange();
-			balance = await _taskBalance(DavidID, orgExchange, user);
-			logger.info('balance', DavidID, balance);
-			return balance;
-		case StanleyID:
-			user = await StanleyConsumer();
-			balance = await _taskBalance(StanleyID, orgConsumer, user);
-			logger.info('balance', StanleyID, balance);
-			return balance;
-		case LamID:
-			user = await LamMerchant();
-			balance = await _taskBalance(LamID, orgMerchant, user);
-			logger.info('balance', LamID, balance);
-			return balance;
-		default:
-
+	case DavidID:
+		user = await DavidExchange();
+		balance = await _taskBalance(DavidID, orgExchange, user);
+		logger.info('balance', DavidID, balance);
+		return balance;
+	case StanleyID:
+		user = await StanleyConsumer();
+		balance = await _taskBalance(StanleyID, orgConsumer, user);
+		logger.info('balance', StanleyID, balance);
+		return balance;
+	case LamID:
+		user = await LamMerchant();
+		balance = await _taskBalance(LamID, orgMerchant, user);
+		logger.info('balance', LamID, balance);
+		return balance;
+	default:
 	}
 };
 const task = async () => {
@@ -258,8 +248,8 @@ const task = async () => {
 		MerchandiseCode: 'item2',
 		MerchandiseAmount: 2,
 	});
-	let purchases;
-	purchases = await viewPurchase(LamID, {});
+
+	const purchases = await viewPurchase(LamID, {});
 	const purchasetxIDs = Object.keys(purchases);
 
 	await taskAccept(LamID, orgMerchant, userLam, purchasetxIDs[0]);

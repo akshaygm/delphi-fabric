@@ -63,7 +63,6 @@ exports.wsServerBuilder = (server, onMessage, onMessageError) => {
 			} catch (err) {
 				logger.error(ws.id, 'ws message handle error', err);
 				await onMessageError(err, ws);
-				ws.close();
 			}
 
 		});
