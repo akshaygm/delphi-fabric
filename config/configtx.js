@@ -1,16 +1,14 @@
 const globalConfig = require('./orgs.json');
-const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
-const {CryptoPath,fsExtra} = require('../common/nodejs/path');
-const logger = require('log4js').getLogger('configtx');
+const {CryptoPath, fsExtra} = require('../common/nodejs/path');
 exports.gen = ({consortiumName = 'SampleConsortium', MSPROOT, PROFILE_BLOCK, configtxFile}) => {
 	const channelsConfig = globalConfig.channels;
 	const ordererConfig = globalConfig.orderer;
 	if (!configtxFile) configtxFile = path.resolve(__dirname, 'configtx.yaml');
 	//	refresh configtxFile
-	if (fs.existsSync(configtxFile)) {
-		fs.unlinkSync(configtxFile);
+	if (fsExtra.pathExistsSync(configtxFile)) {
+		fsExtra.removeSync(configtxFile);
 	}
 
 

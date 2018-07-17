@@ -131,7 +131,7 @@ exports.runPeers = async (volumeName = {CONFIGTX: 'CONFIGTX', MSPROOT: 'MSPROOT'
 	const imageTag = ImageTag({arch, tag: fabricTag});
 	const orgsConfig = globalConfig.orgs;
 	const peers = [];
-	const couchDB = globalConfig.ledger.couchDB ? globalConfig.ledger.couchDB : undefined;
+	const couchDB = globalConfig.ledger.storage==='couchDB' ? globalConfig.ledger.couchDB : undefined;
 
 	if (couchDB) {
 		//	TODO run couchDB on swarm??
@@ -383,17 +383,6 @@ exports.up = async (swarm) => {
 	try {
 		await fabricImagePull({fabricTag, thirdPartyTag, arch});
 		logger.info('[start]swarm Server init steps');
-		if (swarm) {
-			await swarmRenew();
-
-			const {address: ip} = await advertiseAddr();
-			const managerToken = await joinToken();
-			const workerToken = await joinToken('worker');
-			const {port} = require('./swarm/swarm').swarmServer;
-			const swarmServerUrl = `http://localhost:${port}`;
-			await serverClient.ping(swarmServerUrl);
-			await serverClient.leader.update(swarmServerUrl, {ip, hostname: hostname(), managerToken, workerToken});
-		}
 
 		await networkCreateIfNotExist({Name: network}, swarm);
 
