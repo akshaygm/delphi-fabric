@@ -25,8 +25,7 @@ const {genUser} = require('./config/caCryptoGen');
 const getUser = async ({Name}, org) => {
 	return genUser({userName: Name}, org, false);
 };
-module.exports = async (message, ws) => {
-	const data = JSON.parse(message);
+exports.handle = async (data, ws) => {
 	const {fcn, ID} = data;
 	if (!fcn) throw Error('fcn is required');
 	if (!ID) throw Error('ID is required');
@@ -52,8 +51,13 @@ module.exports = async (message, ws) => {
 	const client = await getClient(user);
 	const channel = helper.prepareChannel(channelName, client, true);
 	const peers = helper.newPeers(peerIndexes, org);
-	ws.send({payload: {fcn, args}, status: 200, state: 'ready'});
+	ws.send(JSON.stringify({payload: {fcn, args}, status: 200, state: 'ready'}));
 	const {txEventResponses, proposalResponses} = await invoke(channel, peers, {chaincodeId, fcn, args}, user);
 	const resp = reducer({txEventResponses, proposalResponses}).responses[0];
-	ws.send({payload: resp, status: 200, state: 'finished'});
+	ws.send(JSON.stringify({payload: resp, status: 200, state: 'finished'}));
+};
+const errMap = require('./express/errorCodeMap');
+exports.onError = async (err, ws) => {
+	const status = errMap.get(err);
+	ws.send(JSON.stringify({payload: err.toString(), status, state: 'error'}));
 };

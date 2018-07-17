@@ -24,25 +24,19 @@ app.get('/', (req, res, next) => {
 });
 
 const {wsServerBuilder} = require('./express/webSocketCommon');
-const onMessage = async (data, ws) => {
-	ws.send(`echo ${data}`);
-};
-const wss = wsServerBuilder(server, onMessage);
+const wsApp = require('./wsApp');
+const onMessage = wsApp.handle;
+const onMessageError = wsApp.onError;
+const wss = wsServerBuilder(server, onMessage, onMessageError);
 
 
 app.use('/chaincode', require('./express/http-chaincode'));
 
 
 const invalid = require('./express/formValid').invalid();
-const errorCodeMap = require('./express/errorCodeMap.json');
+const errorCodeMap = require('./express/errorCodeMap.js');
 const errorSyntaxHandle = (err, res) => {
-	let status = 500;
-	for (const errorMessage in errorCodeMap) {
-		if (err.toString().includes(errorMessage)) {
-			status = errorCodeMap[errorMessage];
-			break;
-		}
-	}
+	const status = errorCodeMap.get(err);
 	res.status(status);
 	res.send(err.toString());
 };

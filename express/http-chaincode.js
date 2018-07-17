@@ -6,15 +6,8 @@ const invalid = require('./formValid').invalid();
 const {reducer,} = require('../common/nodejs/chaincode');
 const {instantiate, upgrade, invoke} = require('../app/chaincodeHelper');
 const errorHandle = (err, res) => {
-	const errorCodeMap = require('./errorCodeMap.json');
-
-	let status = 500;
-	for (const errorMessage in errorCodeMap) {
-		if (err.toString().includes(errorMessage)) {
-			status = errorCodeMap[errorMessage];
-			break;
-		}
-	}
+	const errorCodeMap = require('./errorCodeMap.js');
+	const status = errorCodeMap.get(err);
 	res.status(status).json({error: err.toString()});
 
 };
