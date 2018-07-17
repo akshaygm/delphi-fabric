@@ -11,7 +11,6 @@ const peerIndexes = [0];
 const fcnWalletCreate = 'walletCreate',
 	fcnWalletBalance = 'walletBalance',
 	fcnHistory = 'walletHistory',
-	fcnTransfer = 'transfer',
 
 	tt_new_eToken_issue = 'tt_new_eToken_issuance',
 	tt_fiat_eToken_exchange = 'tt_fiat_eToken_exchange',
@@ -122,7 +121,7 @@ const taskExchangeToken = async (id, org, user, Amount, toID) => {
 	await invoke(channel, peers, {chaincodeId, fcn, args}, user);
 };
 const taskTransfer = async (id, org, user, Amount, toID) => {
-	const fcn = fcnTransfer;
+	const fcn = tt;
 	const tx = {
 		To: toID,
 		Amount,
