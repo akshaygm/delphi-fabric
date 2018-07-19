@@ -37,7 +37,7 @@ exports.handle = async (data, ws) => {
 	if (typeof Name !== 'string') {
 		throw Error(`invalid type of ID.Name: ${typeof Name}`);
 	} else if (Name.length > maxNameLength) {
-		throw Error(`length of Name exceed limit Max:${maxNameLength},Current: ${Name.lenght}`);
+		throw Error(`length of Name exceed limit Max:${maxNameLength},Current: ${Name.length}`);
 	}
 
 	if (typeof Type !== 'string' || !TypeMap[Type]) {
@@ -57,14 +57,9 @@ exports.handle = async (data, ws) => {
 			if (typeof Type !== 'string' || !TypeMap[Type]) {
 				throw Error(`invalid To.Type: ${Type}`);
 			}
-			const org = TypeMap[Type];
-			tx.To = {
-				Name: `${To.Name}@${org}`, Type
-			};
-			args[0] = JSON.stringify(tx);
 		}
 	}
-	args = [JSON.stringify({Name: `${Name}@${org}`, Type})].concat(args);
+	args = [JSON.stringify({Name, Type})].concat(args);
 	logger.debug({args});
 	const user = await getUser({Name}, org);
 	const client = await getClient(user);
@@ -73,10 +68,7 @@ exports.handle = async (data, ws) => {
 	ws.send(JSON.stringify({request: {fcn, args}, status: 200, state: 'ready'}));
 	const {txEventResponses, proposalResponses} = await invoke(channel, peers, {chaincodeId, fcn, args}, user);
 	let resp = reducer({txEventResponses, proposalResponses}).responses[0];
-	if (fcn === fcnHistory || fcn === fcnWalletBalance) resp = JSON.parse(resp);
-	if (fcn === listPurchase) {
-		resp = JSON.parse(resp).History;
-	}
+	if (fcn === fcnHistory || fcn === fcnWalletBalance || fcn === listPurchase) resp = JSON.parse(resp);
 	ws.send(JSON.stringify({payload: resp, status: 200, state: 'finished'}));
 };
 const errMap = require('./express/errorCodeMap');

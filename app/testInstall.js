@@ -8,7 +8,12 @@ const chaincodeId = process.env.name ? process.env.name : 'trade';
 
 const chaincodePath = chaincodeConfig.chaincodes[chaincodeId].path;
 
-const instantiate_args = [];
+const orgMap = {
+	c: {Name: 'Consumer', MSPID: 'ConsumerMSP'},
+	m: {Name: 'Merchant', MSPID: 'MerchantMSP'},
+	e: {Name: 'Exchange', MSPID: 'ExchangeMSP'},
+};
+const instantiate_args = [orgMap];
 
 const chaincodeVersion = 'v0';
 const channelName = 'allchannel';
@@ -30,7 +35,8 @@ const task = async () => {
 		const peers = helper.newPeers([0], peerOrg);
 		const client = await helper.getOrgAdmin(peerOrg);
 		const channel = helper.prepareChannel(channelName, client, true);
-		return instantiate(channel, peers, {chaincodeId, chaincodeVersion, args: instantiate_args});
+		const args = instantiate_args.map(e => JSON.stringify(e));
+		return instantiate(channel, peers, {chaincodeId, chaincodeVersion, args});
 	} catch (e) {
 		logger.error(e);
 		process.exit(1);
