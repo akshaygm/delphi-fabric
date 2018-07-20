@@ -42,7 +42,7 @@ exports.wsServerBuilder = (server, onMessage, onMessageError) => {
 			});
 		});
 	};
-	setInterval(heartBeat, 30000);
+	setInterval(heartBeat, 60000);
 
 	wss.on('connection', (ws) => {
 		ws.isAlive = true;

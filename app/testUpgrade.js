@@ -6,7 +6,13 @@ const {updateInstall, nextVersion, upgrade} = require('../common/nodejs/chaincod
 
 const chaincodeId = process.env.name ? process.env.name : 'trade';
 
-const args = [];
+const orgMap = {
+	c: {Name: 'Consumer', MSPID: 'ConsumerMSP'},
+	m: {Name: 'Merchant', MSPID: 'MerchantMSP'},
+	e: {Name: 'Exchange', MSPID: 'ExchangeMSP'},
+};
+
+const args = [orgMap];
 
 const channelName = 'allchannel';
 const updateInstallAll = async () => {
@@ -45,12 +51,13 @@ const task = async () => {
 		const channel = helper.prepareChannel(channelName, client, true);
 		const peers = helper.newPeers([0], orgName);
 		const eventHubs = [];
-		for(const peer of peers){
+		for (const peer of peers) {
 			const eventHub = await peer.eventHubPromise;
-			eventHubs.push(eventHub)
+			eventHubs.push(eventHub);
 		}
-		await upgrade(channel, peers,eventHubs, {chaincodeId, chaincodeVersion, args});
-		//	NOTE: found all peers in channel will create chaincode container with new version for each, but the old version chaincode container remains
+		await upgrade(channel, peers, eventHubs, {chaincodeId, chaincodeVersion,
+			args:args.map(e=>JSON.stringify(e))});
+		//	NOTE: but the old version chaincode container remains
 	} catch (e) {
 		logger.error(e);
 	}
