@@ -2,6 +2,7 @@ const helper = require('./app/helper');
 const {invoke} = require('./app/chaincodeHelper');
 const logger = require('./common/nodejs/logger').new('wsApp');
 const {reducer} = require('./common/nodejs/chaincode');
+const Query = require('./common/nodejs/query');
 const chaincodeId = 'trade';
 
 const fcnHistory = 'walletHistory';
@@ -31,6 +32,15 @@ const getUser = async ({Name}, org) => {
 exports.handle = async (data, ws) => {
 	const {fcn, ID} = data;
 	if (!fcn) throw Error('fcn is required');
+	if (fcn === 'chainInfo') {
+		const orgName = helper.randomOrg('peer');
+		const client = await helper.getOrgAdmin(orgName);
+		const channel = helper.prepareChannel(channelName, client);
+		const peer = helper.newPeers(peerIndexes, orgName)[0];
+		const message = await Query.chain(peer, channel);
+		ws.send(JSON.stringify({payload: message.pretty, status: 200, state: 'finished'}));
+		return;
+	}
 	if (!ID) throw Error('ID is required');
 	const {Name, Type} = ID;
 	const maxNameLength = 55;
@@ -65,6 +75,7 @@ exports.handle = async (data, ws) => {
 	const client = await getClient(user);
 	const channel = helper.prepareChannel(channelName, client, true);
 	const peers = helper.newPeers(peerIndexes, org);
+
 	ws.send(JSON.stringify({request: {fcn, args}, status: 200, state: 'ready'}));
 	const {txEventResponses, proposalResponses} = await invoke(channel, peers, {chaincodeId, fcn, args}, user);
 	let resp = reducer({txEventResponses, proposalResponses}).responses[0];

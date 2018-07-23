@@ -1,14 +1,5 @@
 
 
-Clone
-------------------
-_after first time clone this repository, submodule should be initialize_
-```
-$ cd <delphi-fabric>
-$ git submodule update --init --recursive
-```
-
-
 Installation
 -----------------------
 
@@ -32,11 +23,6 @@ Installation
 
 **Design idea**
  * use fabric-ca to generate all crypto material, instead of cryptogen
- * cluster: 
-    - leader node provide 1. swarm config sharing server 'swarmServer' 2. signature server 'signServer'
-    - master node provide signature server 'signServer', holding 1 CA, 1 orderer, 1 peer 
- * swarmServer:
-    - Redis/Couchdb as DB
  * prefer to use config-less fabric-ca
  * use `npm dockerode` to run docker container & services, instead of `docker-compose` or `docker stack deploy` 
 
@@ -54,39 +40,8 @@ Test on single host
 1. run `$ ./docker.sh` to restart network
 2. run `$ node app/testChannel.js` to create-channel and join-channel
 3. `$ node app/testInstall.js` to install chaincode and instantiate chaincode
-4. `$ node app/testInvoke.js` to invoke chaincode
-
-Test on docker swarm
------------------------
-I have migrated codes in `cluster/managerNode` to new repository [Fabric-swarm-manager](https://github.com/davidkhala/fabric-swarm-manager)
-`fabric-swarm-manager` is used on new managerNode machine `slave` to play with existing cluster
-Current machine is noted as `master` 
-
-**steps**
-1. [master] run `$ ./docker-swarm.sh` to restart network
-2. [master] run `$ node app/testChannel.js` to create-channel and join-channel
-3. [slave] run `$./manager.sh` to prepare for it self
-3. [master] `$ node app/testInstall.js` to install chaincode and instantiate chaincode
-4. [master] `$ node app/testInvoke.js` to invoke chaincode
-
-dep: to import third-party package in vendor folder
---------
-  - dep could only be run under system $GOPATH, 
-  - my sample chaincodes have been migrated to ``github.com/davidkhala/chaincode``
 
 
-## Finished
-
-- kafka on local & swarm
-- use npm:js-yaml to write YAML files instead of jq
-- thirdPartyTag for kafka, zookeeper, couchdb...
-- swarm mode: network server to manage ip:hostname
-- stress test in nodejs: Caliper
-- update system channel ``testchainid``
-- use golang/dep instead of govendor
-- new orderer with same org
-- make pm2 signServer, swarmServer also run in single mode
-- fabric-ca CRUD user and identityService
 ## TODO
 - TLS
 - java sdk and docker-swarm: keep update
