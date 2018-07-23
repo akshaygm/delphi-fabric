@@ -1,0 +1,4 @@
+/.idea/*
+/bin
+/nodejs/node_modules
+/cryptoKeyStore

@@ -1,0 +1,17 @@
+{
+  "name": "nodejs",
+  "version": "1.1.0",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "fabric-ca-client": "1.1.0",
+    "fabric-client": "1.1.0",
+    "fs-extra": "^6.0.1",
+    "grpc": "^1.10.1",
+    "pm2": "^2.10.4",
+    "request": "^2.85.0"
+  },
+  "devDependencies": {
+    "log4js": "^3.0.0"
+  }
+}
