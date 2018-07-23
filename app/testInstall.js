@@ -5,7 +5,7 @@ const logger = require('../common/nodejs/logger').new('testInstall');
 const chaincodeConfig = require('../config/chaincode.json');
 const globalConfig = require('../config/orgs');
 const chaincodeId = process.env.name ? process.env.name : 'trade';
-
+const path = require('path');
 const chaincodePath = chaincodeConfig.chaincodes[chaincodeId].path;
 
 const orgMap = {
@@ -17,6 +17,9 @@ const instantiate_args = [orgMap];
 
 const chaincodeVersion = 'v0';
 const channelName = 'allchannel';
+
+
+process.env.GOPATH = path.resolve(path.dirname(__dirname), 'chaincode');
 //only one time, one org could deploy
 const deploy = async (orgName, peerIndexes) => {
 	const peers = helper.newPeers(peerIndexes, orgName);
